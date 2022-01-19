@@ -1681,8 +1681,9 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
         hash_content = list()
         try:
             source_id = fs.for_package_version(self, self.version).source_id()
-        except fs.ExtrapolationError:
+        except (fs.ExtrapolationError, fs.InvalidArgsError):
             source_id = None
+
         if not source_id:
             # TODO? in cases where a digest or source_id isn't available,
             # should this attempt to download the source and set one? This
@@ -1696,6 +1697,7 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
             hash_content.append(''.encode('utf-8'))
         else:
             hash_content.append(source_id.encode('utf-8'))
+
         hash_content.extend(':'.join((p.sha256, str(p.level))).encode('utf-8')
                             for p in self.spec.patches)
         hash_content.append(package_hash(self.spec, source=content).encode('utf-8'))
