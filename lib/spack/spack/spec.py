@@ -2077,6 +2077,8 @@ class Spec(object):
             node[hash.name] = self.build_hash()
         elif hash.name == 'process_hash':
             node[hash.name] = self.process_hash()
+        elif hash.name == 'runtime_hash':
+            node[hash.name] = self.runtime_hash()
 
         return node
 
@@ -2218,11 +2220,17 @@ class Spec(object):
                 dep_hash, deptypes = elt
             elif isinstance(elt, dict):
                 # new format: elements of dependency spec are keyed.
-                for key in (ht.full_hash.name,
+                for key in (ht.dag_hash.name,
+                            ht.full_hash.name,
                             ht.build_hash.name,
-                            ht.dag_hash.name,
+                            ht.runtime_hash.name,
                             ht.process_hash.name):
                     if key in elt:
+                        # FIXME: if the key is 'hash' it could mean the old
+                        # dag hash without build deps, or the new dag hash which
+                        # is equivalent to the full hash.  If this was the old
+                        # dag hash, we need to keep the hash value but set the
+                        # key hash type to "runtime_hash".
                         dep_hash, deptypes = elt[key], elt['type']
                         hash_type = key
                         break
@@ -3777,6 +3785,7 @@ class Spec(object):
             self._dunder_hash = other._dunder_hash
             self._normal = other._normal
             self._full_hash = other._full_hash
+            self._runtime_hash = other._runtime_hash
             self._package_hash = other._package_hash
         else:
             self._hash = None
@@ -3784,6 +3793,7 @@ class Spec(object):
             self._dunder_hash = None
             self._normal = False
             self._full_hash = None
+            self._runtime_hash = None
             self._package_hash = None
 
         return changed
@@ -4728,6 +4738,8 @@ class Spec(object):
                 # provenance later
                 has_build_hash = getattr(dep, ht.build_hash.name, None)
                 has_full_hash = getattr(dep, ht.full_hash.name, None)
+
+                # FIXME: Should _hash and _runtime_hash be handled here as well?
 
                 # package hash cannot be affected by splice
                 dep.clear_cached_hashes(ignore=['package_hash'])
