@@ -39,19 +39,9 @@ dag_hash = SpecHashDescriptor(
     deptype=('build', 'link', 'run'), package_hash=True, name='hash')
 
 
-#: Same as dag_hash; old name.
-full_hash = SpecHashDescriptor(
-    deptype=('build', 'link', 'run'), package_hash=True, name='full_hash')
-
-
 #: Original Spack hash; used in earlier versions to identify installations.
 runtime_hash = SpecHashDescriptor(
     deptype=('link', 'run'), package_hash=False, name='runtime_hash')
-
-
-#: Hash descriptor that includes build dependencies.
-build_hash = SpecHashDescriptor(
-    deptype=('build', 'link', 'run'), package_hash=False, name='build_hash')
 
 
 #: Hash descriptor used only to transfer a DAG, as is, across processes

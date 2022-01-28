@@ -152,13 +152,8 @@ def test_using_ordered_dict(mock_packages):
         assert level >= 5
 
 
-@pytest.mark.parametrize("hash_type", [
-    ht.dag_hash,
-    ht.build_hash,
-    ht.full_hash
-])
 def test_ordered_read_not_required_for_consistent_dag_hash(
-        hash_type, config, mock_packages
+        config, mock_packages
 ):
     """Make sure ordered serialization isn't required to preserve hashes.
 
@@ -167,6 +162,7 @@ def test_ordered_read_not_required_for_consistent_dag_hash(
     don't want to require them to be serialized in order. This
     ensures that is not required.
     """
+    hash_type = ht.dag_hash
     specs = ['mpileaks ^zmpi', 'dttop', 'dtuse']
     for spec in specs:
         spec = Spec(spec)
@@ -234,17 +230,17 @@ def test_ordered_read_not_required_for_consistent_dag_hash(
         assert spec.dag_hash() == round_trip_reversed_yaml_spec.dag_hash()
         assert spec.dag_hash() == round_trip_reversed_json_spec.dag_hash()
 
-        # full_hashes are equal if we round-tripped by build_hash or full_hash
-        if hash_type in (ht.build_hash, ht.full_hash):
+        # dag_hash is equal after round-trip by dag_hash
+        if hash_type in (ht.dag_hash,):
             spec.concretize()
             round_trip_yaml_spec.concretize()
             round_trip_json_spec.concretize()
             round_trip_reversed_yaml_spec.concretize()
             round_trip_reversed_json_spec.concretize()
-            assert spec.full_hash() == round_trip_yaml_spec.full_hash()
-            assert spec.full_hash() == round_trip_json_spec.full_hash()
-            assert spec.full_hash() == round_trip_reversed_yaml_spec.full_hash()
-            assert spec.full_hash() == round_trip_reversed_json_spec.full_hash()
+            assert spec.dag_hash() == round_trip_yaml_spec.dag_hash()
+            assert spec.dag_hash() == round_trip_json_spec.dag_hash()
+            assert spec.dag_hash() == round_trip_reversed_yaml_spec.dag_hash()
+            assert spec.dag_hash() == round_trip_reversed_json_spec.dag_hash()
 
 
 @pytest.mark.parametrize("module", [
@@ -350,7 +346,7 @@ def test_save_dependency_spec_jsons_subset(tmpdir, config):
         spec_a.concretize()
         b_spec = spec_a['b']
         c_spec = spec_a['c']
-        spec_a_json = spec_a.to_json(hash=ht.build_hash)
+        spec_a_json = spec_a.to_json(hash=ht.dag_hash)
 
         save_dependency_specfiles(spec_a_json, output_path, ['b', 'c'])
 
