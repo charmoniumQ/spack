@@ -428,7 +428,7 @@ class Database(object):
                              .format(spec.name))
 
         return os.path.join(self._failure_dir,
-                            '{0}-{1}'.format(spec.name, spec.full_hash()))
+                            '{0}-{1}'.format(spec.name, spec.dag_hash()))
 
     def clear_all_failures(self):
         """Force remove install failure tracking files."""
@@ -1147,7 +1147,6 @@ class Database(object):
             # the original hash of concrete specs.
             new_spec._mark_concrete()
             new_spec._hash = key
-            new_spec._full_hash = spec._full_hash
 
         else:
             # It is already in the database

@@ -124,7 +124,7 @@ def test_read_and_write_spec(temporary_store, config, mock_packages):
         # TODO: fix this when we can concretize more loosely based on
         # TODO: what is installed. We currently omit these to
         # TODO: increase reuse of build dependencies.
-        stored_deptypes = spack.hash_types.full_hash
+        stored_deptypes = spack.hash_types.dag_hash
         expected = spec.copy(deps=stored_deptypes)
         expected._mark_concrete()
 
