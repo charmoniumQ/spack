@@ -167,8 +167,7 @@ def ci_reindex(args):
 
 def ci_rebuild(args):
     """Check a single spec against the remote mirror, and rebuild it from
-       source if the mirror does not contain the full hash match of the spec
-       as computed locally. """
+       source if the mirror does not contain the hash. """
     env = spack.cmd.require_active_env(cmd_name='ci rebuild')
 
     # Make sure the environment is "gitlab-enabled", or else there's nothing
@@ -366,25 +365,25 @@ def ci_rebuild(args):
         fd.write(b'\n')
 
     # If we decided there should be a temporary storage mechanism, add that
-    # mirror now so it's used when we check for a full hash match already
+    # mirror now so it's used when we check for a hash match already
     # built for this spec.
     if pipeline_mirror_url:
         spack.mirror.add(spack_ci.TEMP_STORAGE_MIRROR_NAME,
                          pipeline_mirror_url,
                          cfg.default_modify_scope())
 
-    # Check configured mirrors for a built spec with a matching full hash
+    # Check configured mirrors for a built spec with a matching hash
     matches = bindist.get_mirrors_for_spec(
-        job_spec, full_hash_match=True, index_only=False)
+        job_spec, index_only=False)
 
     if matches:
-        # Got a full hash match on at least one configured mirror.  All
+        # Got a hash match on at least one configured mirror.  All
         # matches represent the fully up-to-date spec, so should all be
         # equivalent.  If artifacts mirror is enabled, we just pick one
         # of the matches and download the buildcache files from there to
         # the artifacts, so they're available to be used by dependent
         # jobs in subsequent stages.
-        tty.msg('No need to rebuild {0}, found full hash match at: '.format(
+        tty.msg('No need to rebuild {0}, found hash match at: '.format(
             job_spec_pkg_name))
         for match in matches:
             tty.msg('    {0}'.format(match['mirror_url']))
@@ -403,7 +402,7 @@ def ci_rebuild(args):
         # Now we are done and successful
         sys.exit(0)
 
-    # No full hash match anywhere means we need to rebuild spec
+    # No hash match anywhere means we need to rebuild spec
 
     # Start with spack arguments
     install_args = [base_arg for base_arg in CI_REBUILD_INSTALL_BASE_ARGS]
@@ -415,7 +414,6 @@ def ci_rebuild(args):
     install_args.extend([
         'install',
         '--keep-stage',
-        '--require-full-hash-match',
     ])
 
     can_verify = spack_ci.can_verify_binaries()
@@ -477,13 +475,13 @@ def ci_rebuild(args):
     tty.debug('spack install exited {0}'.format(install_exit_code))
 
     # If a spec fails to build in a spack develop pipeline, we add it to a
-    # list of known broken full hashes.  This allows spack PR pipelines to
+    # list of known broken hashes.  This allows spack PR pipelines to
     # avoid wasting compute cycles attempting to build those hashes.
     if install_exit_code == INSTALL_FAIL_CODE and spack_is_develop_pipeline:
         tty.debug('Install failed on develop')
         if 'broken-specs-url' in gitlab_ci:
             broken_specs_url = gitlab_ci['broken-specs-url']
-            dev_fail_hash = job_spec.full_hash()
+            dev_fail_hash = job_spec.dag_hash()
             broken_spec_path = url_util.join(broken_specs_url, dev_fail_hash)
             tty.msg('Reporting broken develop build as: {0}'.format(
                 broken_spec_path))
@@ -494,7 +492,7 @@ def ci_rebuild(args):
                 'broken-spec': {
                     'job-url': get_env_var('CI_JOB_URL'),
                     'pipeline-url': get_env_var('CI_PIPELINE_URL'),
-                    'concrete-spec-yaml': job_spec.to_dict(hash=ht.full_hash)
+                    'concrete-spec-yaml': job_spec.to_dict(hash=ht.dag_hash)
                 }
             }
 
@@ -555,7 +553,7 @@ def ci_rebuild(args):
         # on the broken-specs list. If so, remove it.
         if spack_is_develop_pipeline and 'broken-specs-url' in gitlab_ci:
             broken_specs_url = gitlab_ci['broken-specs-url']
-            just_built_hash = job_spec.full_hash()
+            just_built_hash = job_spec.dag_hash()
             broken_spec_path = url_util.join(broken_specs_url, just_built_hash)
             if web_util.url_exists(broken_spec_path):
                 tty.msg('Removing {0} from the list of broken specs'.format(

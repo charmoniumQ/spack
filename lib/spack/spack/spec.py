@@ -2175,7 +2175,6 @@ class Spec(object):
     @staticmethod
     def read_yaml_dep_specs(deps, hash_type=ht.dag_hash.name):
         """Read the DependencySpec portion of a YAML-formatted Spec.
-
         This needs to be backward-compatible with older spack spec
         formats so that reindex will work on old specs/databases.
         """
@@ -2194,17 +2193,17 @@ class Spec(object):
                 dep_hash, deptypes = elt
             elif isinstance(elt, dict):
                 # new format: elements of dependency spec are keyed.
-                for key in (ht.dag_hash.name,
-                            ht.runtime_hash.name,
+                for key in (ht.full_hash.name,
+                            ht.build_hash.name,
+                            ht.dag_hash.name,
                             ht.process_hash.name):
                     if key in elt:
-                        # FIXME: if the key is 'hash' it could mean the old
-                        # dag hash without build deps, or the new dag hash which
-                        # is equivalent to the full hash.  If this was the old
-                        # dag hash, we need to keep the hash value but set the
-                        # key hash type to "runtime_hash".
-                        dep_hash, deptypes = elt[key], elt['type']
-                        hash_type = key
+                        if key == ht.process_hash.name:
+                            dep_hash, deptypes = elt[key], elt['type']
+                            hash_type = key
+                        else:
+                            dep_hash, deptypes = elt[key], elt['type']
+                            hash_type = key
                         break
                 else:  # We never determined a hash type...
                     raise spack.error.SpecError(

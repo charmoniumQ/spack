@@ -49,7 +49,7 @@ for further documentation regarding the spec syntax, see:
         help='show fully qualified package names')
     subparser.add_argument(
         '--hash-type', default="build_hash",
-        choices=['build_hash', 'full_hash', 'dag_hash'],
+        choices=['runtime_hash', 'dag_hash'],
         help='generate spec with a particular hash type.')
     subparser.add_argument(
         '-t', '--types', action='store_true', default=False,
