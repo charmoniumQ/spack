@@ -338,12 +338,12 @@ def ci_rebuild(args):
     # also be used in the generated "spack install" command to install the spec
     tty.debug('job concrete spec path: {0}'.format(job_spec_yaml_path))
     with open(job_spec_yaml_path, 'w') as fd:
-        fd.write(job_spec.to_yaml(hash=ht.build_hash))
+        fd.write(job_spec.to_yaml(hash=ht.dag_hash))
 
     # Write the concrete root spec yaml into the reproduction directory
     root_spec_yaml_path = os.path.join(repro_dir, 'root.yaml')
     with open(root_spec_yaml_path, 'w') as fd:
-        fd.write(spec_map['root'].to_yaml(hash=ht.build_hash))
+        fd.write(spec_map['root'].to_yaml(hash=ht.dag_hash))
 
     # Write some other details to aid in reproduction into an artifact
     repro_file = os.path.join(repro_dir, 'repro.json')

@@ -2148,7 +2148,7 @@ class Spec(object):
                 # FIXME: Monkey patches mvar to store patches order
                 mvar._patches_in_order_of_appearance = patches
 
-        # Don't read dependencies here; from_node_dict() is used by
+        # Don't read dependencies here; from_dict() is used by
         # from_yaml() and from_json() to read the root *and* each dependency
         # spec.
 
@@ -2193,17 +2193,14 @@ class Spec(object):
                 dep_hash, deptypes = elt
             elif isinstance(elt, dict):
                 # new format: elements of dependency spec are keyed.
-                for key in (ht.full_hash.name,
+                for key in (ht.dag_hash.name,
                             ht.build_hash.name,
-                            ht.dag_hash.name,
+                            ht.full_hash.name,
+                            ht.runtime_hash.name,
                             ht.process_hash.name):
                     if key in elt:
-                        if key == ht.process_hash.name:
-                            dep_hash, deptypes = elt[key], elt['type']
-                            hash_type = key
-                        else:
-                            dep_hash, deptypes = elt[key], elt['type']
-                            hash_type = key
+                        dep_hash, deptypes = elt[key], elt['type']
+                        hash_type = key
                         break
                 else:  # We never determined a hash type...
                     raise spack.error.SpecError(
@@ -4801,7 +4798,7 @@ def _spec_from_old_dict(data):
         if 'dependencies' not in node[name]:
             continue
 
-        for dname, dhash, dtypes, _ in Spec.dependencies_from_node_dict(node):
+        for dname, _, dtypes, _ in Spec.dependencies_from_node_dict(node):
             deps[name]._add_dependency(deps[dname], dtypes)
 
     return spec
@@ -4845,10 +4842,7 @@ def _spec_from_dict(data):
 
     # Pass 1: Create a single lookup dictionary by hash
     for i, node in enumerate(nodes):
-        if 'build_spec' in node.keys():
-            node_hash = node[hash_type]
-        else:
-            node_hash = node[hash_type]
+        node_hash = node[hash_type]
         node_spec = Spec.from_node_dict(node)
         hash_dict[node_hash] = node
         hash_dict[node_hash]['node_spec'] = node_spec
