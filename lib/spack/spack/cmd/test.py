@@ -344,6 +344,10 @@ def _report_suite_results(test_suite, args, constraints):
         failed, skipped, untested = 0, 0, 0
         for pkg_id in test_specs:
             tty.msg('  {0}'.format(pkg_id))
+            # The test_hash_change method never finds the pkg_id among the
+            # restuls, here, because the pkg id is composed using the dag
+            # hash, and that test was changed to replace full_hash
+            # with dag_hash.
             if pkg_id in results:
                 status = results[pkg_id]
                 if status == 'FAILED':

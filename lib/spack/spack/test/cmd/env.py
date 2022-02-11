@@ -974,14 +974,14 @@ def create_v1_lockfile_dict(roots, all_specs):
         },
         "roots": list(
             {
-                "hash": s.runtime_hash(),
+                "hash": s.dag_hash(),
                 "spec": s.name
             } for s in roots
         ),
         # Version one lockfiles use the dag hash without build deps as keys,
         # but they write out the full node dict (including build deps)
         "concrete_specs": dict(
-            (s.runtime_hash(), s.to_node_dict(hash=ht.dag_hash))
+            (s.dag_hash(), s.to_node_dict(hash=ht.dag_hash))
             for s in all_specs
         )
     }
@@ -1043,6 +1043,7 @@ def test_read_old_lock_creates_backup(tmpdir):
         assert os.path.exists(e._lock_backup_v1_path)
         with open(e._lock_backup_v1_path, 'r') as backup_v1_file:
             lockfile_dict_v1 = sjson.load(backup_v1_file)
+
         # Make sure that the backup file follows the v1 hash scheme
         assert y.dag_hash() in lockfile_dict_v1['concrete_specs']
 

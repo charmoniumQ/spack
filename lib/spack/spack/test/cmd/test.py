@@ -266,7 +266,9 @@ def test_hash_change(mock_test_stage, mock_packages, mock_archive, mock_fetch,
     find_output = spack_test('find')
     assert 'printpkg' in find_output
     # The results should be obtainable
-    results_output = spack_test('results')
+    results_output = spack_test('results', output=str)
+    print('spack test results')
+    print(results_output)
     assert 'PASSED' in results_output
 
     assert(False)

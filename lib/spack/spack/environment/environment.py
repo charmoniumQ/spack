@@ -1801,14 +1801,15 @@ class Environment(object):
 
     def _read_lockfile_dict(self, d):
         """Read a lockfile dictionary into this environment."""
+        self.specs_by_hash = {}
+
         roots = d['roots']
         self.concretized_user_specs = [Spec(r['spec']) for r in roots]
         self.concretized_order = [r['hash'] for r in roots]
-
         json_specs_by_hash = d['concrete_specs']
-        root_hashes = set(self.concretized_order)
 
         specs_by_hash = {}
+
         for lockfile_key, node_dict in json_specs_by_hash.items():
             specs_by_hash[lockfile_key] = Spec.from_node_dict(node_dict)
 
@@ -1822,10 +1823,12 @@ class Environment(object):
         # contains the keys used by modern spack (i.e. the dag_hash
         # that includes build deps and package hash).
         self.concretized_order = [specs_by_hash[h_key].dag_hash()
-            for h_key in self.concretized_order]
+                                  for h_key in self.concretized_order]
 
         for _, env_spec in specs_by_hash.items():
-            self.specs_by_hash[env_spec.dag_hash()] = env_spec
+            spec_dag_hash = env_spec.dag_hash()
+            if spec_dag_hash in self.concretized_order:
+                self.specs_by_hash[spec_dag_hash] = env_spec
 
     def write(self, regenerate=True):
         """Writes an in-memory environment to its location on disk.
