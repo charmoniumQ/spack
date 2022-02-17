@@ -19,6 +19,7 @@ import spack.environment as ev
 import spack.environment.shell
 import spack.hash_types as ht
 import spack.modules
+import spack.paths
 import spack.repo
 import spack.util.spack_json as sjson
 from spack.cmd.env import _env_create
@@ -27,6 +28,7 @@ from spack.spec import Spec
 from spack.stage import stage_prefix
 from spack.util.mock_package import MockPackageMultiRepo
 from spack.util.path import substitute_path_variables
+from spack.version import Version
 
 # TODO-27021
 # everything here uses the mock_env_path
@@ -2844,3 +2846,47 @@ def test_environment_view_target_already_exists(
     # Make sure the dir was left untouched.
     assert not os.path.lexists(view)
     assert os.listdir(real_view) == ['file']
+
+
+def test_read_legacy_lockfile_and_reconcretize(mock_stage, mock_fetch, install_mockery):
+    """Make sure that when we read a legacy environment lock file with a hash
+    conflict (one from before we switched to full hash), the behavior as to
+    which of the conflicting specs we pick is deterministic.  When we read
+    the lockfile, we process root specs in the order they appear in 'roots',
+    so we expect the dependencies of the last root in that list to be the
+    ones that appear in the environment before we forcefully re-concretize
+    the environment.  After we force reconcretization, we should see all
+    the dependencies again."""
+    legacy_lockfile_path = os.path.join(
+        spack.paths.test_path, 'data', 'legacy_env', 'spack.lock'
+    )
+
+    env('create', 'test', legacy_lockfile_path)
+    test = ev.read('test')
+
+    # Before we forcefully reconcretize, we expect there will be only a
+    # single actual spec in the environment, and it should depend on
+    # dtbuild1@1.0, since that root appears last in the list.
+    assert len(test.specs_by_hash) == 1
+
+    single_root = next(iter(test.specs_by_hash.values()))
+
+    assert single_root['dtbuild1'].version == Version('1.0')
+
+    # Now forcefully reconcretize
+    with ev.read('test'):
+        concretize('-f')
+
+    test = ev.read('test')
+
+    # After reconcretizing, we should again see two roots, one depending on
+    # each of the dtbuild1 versions specified in the roots of the original
+    # lockfile.
+    assert len(test.specs_by_hash) == 2
+
+    expected_dtbuild1_versions = [Version('0.5'), Version('1.0')]
+
+    for s in test.specs_by_hash.values():
+        expected_dtbuild1_versions.remove(s['dtbuild1'].version)
+
+    assert len(expected_dtbuild1_versions) == 0
