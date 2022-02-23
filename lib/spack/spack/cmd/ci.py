@@ -279,8 +279,8 @@ def ci_rebuild(args):
         env, root_spec, job_spec_pkg_name, compiler_action)
     job_spec = spec_map[job_spec_pkg_name]
 
-    job_spec_yaml_file = '{0}.yaml'.format(job_spec_pkg_name)
-    job_spec_yaml_path = os.path.join(repro_dir, job_spec_yaml_file)
+    job_spec_json_file = '{0}.json'.format(job_spec_pkg_name)
+    job_spec_json_path = os.path.join(repro_dir, job_spec_json_file)
 
     # To provide logs, cdash reports, etc for developer download/perusal,
     # these things have to be put into artifacts.  This means downstream
@@ -334,23 +334,23 @@ def ci_rebuild(args):
     # using a compiler already installed on the target system).
     spack_ci.configure_compilers(compiler_action)
 
-    # Write this job's spec yaml into the reproduction directory, and it will
+    # Write this job's spec json into the reproduction directory, and it will
     # also be used in the generated "spack install" command to install the spec
-    tty.debug('job concrete spec path: {0}'.format(job_spec_yaml_path))
-    with open(job_spec_yaml_path, 'w') as fd:
-        fd.write(job_spec.to_yaml(hash=ht.dag_hash))
+    tty.debug('job concrete spec path: {0}'.format(job_spec_json_path))
+    with open(job_spec_json_path, 'w') as fd:
+        fd.write(job_spec.to_json(hash=ht.dag_hash))
 
-    # Write the concrete root spec yaml into the reproduction directory
-    root_spec_yaml_path = os.path.join(repro_dir, 'root.yaml')
-    with open(root_spec_yaml_path, 'w') as fd:
-        fd.write(spec_map['root'].to_yaml(hash=ht.dag_hash))
+    # Write the concrete root spec json into the reproduction directory
+    root_spec_json_path = os.path.join(repro_dir, 'root.json')
+    with open(root_spec_json_path, 'w') as fd:
+        fd.write(spec_map['root'].to_json(hash=ht.dag_hash))
 
     # Write some other details to aid in reproduction into an artifact
     repro_file = os.path.join(repro_dir, 'repro.json')
     repro_details = {
         'job_name': ci_job_name,
-        'job_spec_yaml': job_spec_yaml_file,
-        'root_spec_yaml': 'root.yaml',
+        'job_spec_json': job_spec_json_file,
+        'root_spec_json': 'root.json',
         'ci_project_dir': ci_project_dir
     }
     with open(repro_file, 'w') as fd:
@@ -441,8 +441,8 @@ def ci_rebuild(args):
 
     # TODO: once we have the concrete spec registry, use the DAG hash
     # to identify the spec to install, rather than the concrete spec
-    # yaml file.
-    install_args.extend(['-f', job_spec_yaml_path])
+    # json file.
+    install_args.extend(['-f', job_spec_json_path])
 
     tty.debug('Installing {0} from source'.format(job_spec.name))
     tty.debug('spack install arguments: {0}'.format(
@@ -492,7 +492,7 @@ def ci_rebuild(args):
                 'broken-spec': {
                     'job-url': get_env_var('CI_JOB_URL'),
                     'pipeline-url': get_env_var('CI_PIPELINE_URL'),
-                    'concrete-spec-yaml': job_spec.to_dict(hash=ht.dag_hash)
+                    'concrete-spec-dict': job_spec.to_dict(hash=ht.dag_hash)
                 }
             }
 
@@ -537,7 +537,7 @@ def ci_rebuild(args):
         # per-PR mirror, if this is a PR pipeline
         if buildcache_mirror_url:
             spack_ci.push_mirror_contents(
-                env, job_spec_yaml_path, buildcache_mirror_url, sign_binaries
+                env, job_spec_json_path, buildcache_mirror_url, sign_binaries
             )
 
         # Create another copy of that buildcache in the per-pipeline
@@ -546,7 +546,7 @@ def ci_rebuild(args):
         # prefix is set)
         if pipeline_mirror_url:
             spack_ci.push_mirror_contents(
-                env, job_spec_yaml_path, pipeline_mirror_url, sign_binaries
+                env, job_spec_json_path, pipeline_mirror_url, sign_binaries
             )
 
         # If this is a develop pipeline, check if the spec that we just built is

@@ -846,14 +846,14 @@ def test_install_no_add_in_env(tmpdir, mock_fetch, install_mockery,
         post_install_specs = e.all_specs()
         assert all([s in env_specs for s in post_install_specs])
 
-        # Make sure we can install a concrete dependency spec from a spec.yaml
+        # Make sure we can install a concrete dependency spec from a spec.json
         # file on disk, using the ``--no-add` option, and the spec is installed
         # but not added as a root
-        mpi_spec_yaml_path = tmpdir.join('{0}.yaml'.format(mpi_spec.name))
-        with open(mpi_spec_yaml_path.strpath, 'w') as fd:
-            fd.write(mpi_spec.to_yaml(hash=ht.dag_hash))
+        mpi_spec_json_path = tmpdir.join('{0}.json'.format(mpi_spec.name))
+        with open(mpi_spec_json_path.strpath, 'w') as fd:
+            fd.write(mpi_spec.to_json(hash=ht.dag_hash))
 
-        install('--no-add', '-f', mpi_spec_yaml_path.strpath)
+        install('--no-add', '-f', mpi_spec_json_path.strpath)
         assert(mpi_spec not in e.roots())
 
         find_output = find('-l', output=str)

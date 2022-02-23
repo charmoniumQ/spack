@@ -4702,7 +4702,7 @@ class Spec(object):
                 # provenance later
                 has_dag_hash = getattr(dep, ht.dag_hash.name, None)
 
-                # FIXME: Should _runtime_hash be handled here as well?
+                # TODO: Should _runtime_hash be handled here as well?
 
                 # package hash cannot be affected by splice
                 dep.clear_cached_hashes(ignore=['package_hash'])
