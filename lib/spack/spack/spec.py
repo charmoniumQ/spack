@@ -1794,6 +1794,10 @@ class Spec(object):
         """Get the first <bits> bits of the DAG hash as an integer type."""
         return spack.util.hash.base32_prefix_bits(self.dag_hash(), bits)
 
+    def process_hash_bit_prefix(self, bits):
+        """Get the first <bits> bits of the DAG hash as an integer type."""
+        return spack.util.hash.base32_prefix_bits(self.process_hash(), bits)
+
     def to_node_dict(self, hash=ht.dag_hash):
         """Create a dictionary representing the state of this Spec.
 
@@ -4733,7 +4737,7 @@ class Spec(object):
         # This is good for large, unchanging specs.
         if self.concrete:
             if not self._dunder_hash:
-                self._dunder_hash = self.dag_hash_bit_prefix(64)
+                self._dunder_hash = self.process_hash_bit_prefix(64)
             return self._dunder_hash
 
         # This is the normal hash for lazy_lexicographic_ordering. It's
