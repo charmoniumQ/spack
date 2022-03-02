@@ -108,13 +108,9 @@ class DirectoryLayout(object):
         """Write a spec out to a file."""
         _check_concrete(spec)
         with open(path, 'w') as f:
-            # The hash the the projection is the DAG hash which now contains
+            # The hash of the projection is the DAG hash which now contains
             # the full provenance, so it's availabe if we want it later
-            # extension = os.path.splitext(path)[-1].lower()
-            # if 'json' in extension:
             spec.to_json(f, hash=ht.dag_hash)
-            # elif 'yaml' in extension:
-            #     spec.to_yaml(f, hash=ht.dag_hash)
 
     def write_host_environment(self, spec):
         """The host environment is a json file with os, kernel, and spack

@@ -373,8 +373,7 @@ def ci_rebuild(args):
                          cfg.default_modify_scope())
 
     # Check configured mirrors for a built spec with a matching hash
-    matches = bindist.get_mirrors_for_spec(
-        job_spec, index_only=False)
+    matches = bindist.get_mirrors_for_spec(job_spec, index_only=False)
 
     if matches:
         # Got a hash match on at least one configured mirror.  All
