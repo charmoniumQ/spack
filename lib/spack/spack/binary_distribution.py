@@ -398,6 +398,11 @@ class BinaryCacheIndex(object):
         hash_fetch_url = url_util.join(
             mirror_url, _build_cache_relative_path, 'index.json.hash')
 
+        if not web_util.url_exists(index_fetch_url):
+            # A binary mirror is not required to have an index, so avoid
+            # raising FetchCacheError in that case.
+            return False
+
         old_cache_key = None
         fetched_hash = None
 
