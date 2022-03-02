@@ -1164,7 +1164,7 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
 
             final_job['stage'] = 'stage-rebuild-index'
             final_job['script'] = [
-                'spack -d buildcache update-index --keys -d {0}'.format(
+                'spack buildcache update-index --keys -d {0}'.format(
                     index_target_mirror)
             ]
             final_job['when'] = 'always'

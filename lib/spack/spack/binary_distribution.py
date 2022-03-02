@@ -810,13 +810,13 @@ def generate_package_index(cache_prefix):
                 tty.error('Error reading specfile: {0}'.format(file_path))
                 tty.error(url_err)
 
-        # Now generate the index, compute it's hash, and push the two files to
+        # Now generate the index, compute its hash, and push the two files to
         # the mirror.
         index_json_path = os.path.join(db_root_dir, 'index.json')
         with open(index_json_path, 'w') as f:
             db._write_to_file(f)
 
-        # Read the index back in and compute it's hash
+        # Read the index back in and compute its hash
         with open(index_json_path) as f:
             index_string = f.read()
             index_hash = compute_hash(index_string)
@@ -1795,8 +1795,7 @@ def needs_rebuild(spec, mirror_url):
     return not web_util.url_exists(specfile_path)
 
 
-def check_specs_against_mirrors(mirrors, specs, output_file=None,
-                                rebuild_on_errors=False):
+def check_specs_against_mirrors(mirrors, specs, output_file=None):
     """Check all the given specs against buildcaches on the given mirrors and
     determine if any of the specs need to be rebuilt.  Specs need to be rebuilt
     when their hash doesn't exist in the mirror.

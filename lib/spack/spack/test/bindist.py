@@ -203,9 +203,7 @@ def test_default_rpaths_create_install_default_layout(mirror_dir):
     sy_spec = Spec('symly').concretized()
 
     # Install 'corge' without using a cache
-    output = install_cmd('--no-cache', cspec.name, output=str, fail_on_error=False)
-    print('spack install --no-cache {0}'.format(cspec.name))
-    print(output)
+    install_cmd('--no-cache', cspec.name)
     install_cmd('--no-cache', sy_spec.name)
 
     # Create a buildache
@@ -389,9 +387,7 @@ def test_built_spec_cache(mirror_dir):
     and uses it to populate the binary_distribution built spec cache, when
     this test calls get_mirrors_for_spec, it is testing the popluation of
     that cache from a buildcache index. """
-    output = buildcache_cmd('list', '-a', '-l', output=str)
-    print('spack buildcache list -a -l')
-    print(output)
+    buildcache_cmd('list', '-a', '-l')
 
     gspec, cspec = Spec('garply').concretized(), Spec('corge').concretized()
 

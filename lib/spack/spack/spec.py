@@ -2037,7 +2037,7 @@ class Spec(object):
         if self.concrete:
             # dag_hash can be written out if:
             # 1. it's precomputed (i.e. we read it from somewhere
-            #    and it was already on the spec
+            #    and it was already on the spec)
             # 2. we can still compute it lazily (i.e. we just made the spec and
             #    have the full dependency graph on-hand)
             #
