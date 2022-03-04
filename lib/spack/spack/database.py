@@ -1087,6 +1087,8 @@ class Database(object):
                 "Specs added to DB must be concrete.")
 
         key = spec.dag_hash()
+        spec_run_hash = spec._runtime_hash
+        spec_pkg_hash = spec._package_hash
         upstream, record = self.query_by_spec_hash(key)
         if upstream:
             return
@@ -1144,9 +1146,11 @@ class Database(object):
                     record.ref_count += 1
 
             # Mark concrete once everything is built, and preserve
-            # the original hash of concrete specs.
+            # the original hashes of concrete specs.
             new_spec._mark_concrete()
             new_spec._hash = key
+            new_spec._runtime_hash = spec_run_hash
+            new_spec._package_hash = spec_pkg_hash
 
         else:
             # It is already in the database
