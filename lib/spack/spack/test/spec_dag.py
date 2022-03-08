@@ -8,6 +8,7 @@ These tests check Spec DAG operations using dummy packages.
 import pytest
 
 import spack.error
+import spack.hash_types as ht
 import spack.package
 import spack.util.hash as hashutil
 from spack.dependency import Dependency, all_deptypes, canonical_deptype
@@ -119,7 +120,8 @@ def test_installed_deps():
         c_spec.concretize()
         assert c_spec['d'].version == spack.version.Version('2')
 
-        c_installed = spack.spec.Spec.from_dict(c_spec.to_dict())
+        c_installed = spack.spec.Spec.from_dict(
+            c_spec.to_dict(hash=ht.runtime_hash))
         for spec in c_installed.traverse():
             setattr(spec.package, 'installed', True)
 
