@@ -1770,7 +1770,14 @@ class Spec(object):
     def dag_hash(self, length=None):
         """This is Spack's default hash, used to identify installations.
 
-        Same as the full hash (was previously same as runtime hash).
+        This is the finest-grained hash, and includes build dependencies as
+        well as the package hash, so that we know when package files have
+        changed between builds.  Previously, the DAG hash excluded build
+        dependencies and the package hash, and the full_hash provided that
+        functionality.  But the full_hash was deprecated and the dag_hash
+        modified to behave in the same way so that install trees, the db,
+        environments, and buildcaches would all be keyed by the finest
+        grained hash.
         """
         return self._cached_hash(ht.dag_hash, length)
 

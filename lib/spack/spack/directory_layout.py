@@ -108,7 +108,7 @@ class DirectoryLayout(object):
         """Write a spec out to a file."""
         _check_concrete(spec)
         with open(path, 'w') as f:
-            # The hash of the projection is the DAG hash which now contains
+            # The hash of the projection is the DAG hash which contains
             # the full provenance, so it's availabe if we want it later
             spec.to_json(f, hash=ht.dag_hash)
 
