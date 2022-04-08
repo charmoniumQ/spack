@@ -1682,6 +1682,9 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
         try:
             source_id = fs.for_package_version(self, self.version).source_id()
         except (fs.ExtrapolationError, fs.InvalidArgsError):
+            # ExtrapolationError happens if the package has no fetchers defined.
+            # InvalidArgsError happens when there are version directives with args,
+            #     but none of them identifies an actual fetcher.
             source_id = None
 
         if not source_id:
