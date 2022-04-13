@@ -1764,12 +1764,7 @@ class Spec(object):
 
         This is the finest-grained hash, and includes build dependencies as
         well as the package hash, so that we know when package files have
-        changed between builds.  Previously, the DAG hash excluded build
-        dependencies and the package hash, and the full_hash provided that
-        functionality.  But the full_hash was deprecated and the dag_hash
-        modified to behave in the same way so that install trees, the db,
-        environments, and buildcaches would all be keyed by the finest
-        grained hash.
+        changed between builds.
         """
         return self._cached_hash(ht.dag_hash, length)
 
