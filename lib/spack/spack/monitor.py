@@ -132,7 +132,7 @@ class SpackMonitorClient:
         self.tags = tags
         self.save_local = save_local
 
-        # We keey lookup of build_id by dag_hash
+        # We key lookup of build_id by dag_hash
         self.build_ids = {}
         self.setup_save()
 
