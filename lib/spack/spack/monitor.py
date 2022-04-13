@@ -412,7 +412,9 @@ class SpackMonitorClient:
                 spec.concretize()
 
             # Remove extra level of nesting
-            as_dict = {"spec": spec.to_dict(hash=ht.dag_hash)['spec'],
+            # This is the only place in Spack we still use full_hash, as `spack monitor`
+            # requires specs with full_hash-keyed dependencies.
+            as_dict = {"spec": spec.to_dict(hash=ht.full_hash)['spec'],
                        "spack_version": self.spack_version}
 
             if self.save_local:
