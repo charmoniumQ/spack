@@ -437,8 +437,7 @@ class SpackMonitorClient:
             meta = spec.to_dict()['spec']
             nodes = []
             for node in meta.get("nodes", []):
-                for hashtype in ["hash", "runtime_hash"]:
-                    node[hashtype] = "FAILED_CONCRETIZATION"
+                node["full_hash"] = "FAILED_CONCRETIZATION"
                 nodes.append(node)
             meta['nodes'] = nodes
 
@@ -476,7 +475,7 @@ class SpackMonitorClient:
 
         # Prepare build environment data (including spack version)
         data = self.build_environment.copy()
-        data['hash'] = dag_hash
+        data['full_hash'] = dag_hash
 
         # If the build should be tagged, add it
         if self.tags:
