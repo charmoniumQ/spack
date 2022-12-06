@@ -16,9 +16,12 @@ class PyAzureCliCore(PythonPackage):
     version("2.9.1", sha256="8618a30f7ea2188506f29801220c06396d731c26e4de92c327e6b0e8cc790db5")
 
     depends_on("py-setuptools", type="build")
-    depends_on("py-adal@1.2.3:1.2", type=("build", "run"))
+    # https://github.com/Azure/azure-cli/blob/azure-cli-2.20.0/src/azure-cli-core/setup.py
+    depends_on("py-adal@1.2.3:1.2", type=("build", "run"), when="@:2.19")
+    depends_on("py-adal@1.2.6:1.2", type=("build", "run"), when="@2.20:")
     depends_on("py-argcomplete@1.8:1", type=("build", "run"))
-    depends_on("py-azure-cli-telemetry", type=("build", "run"))
+    depends_on("py-azure-cli-telemetry", type=("build", "run"), when="@:2.19")
+    depends_on("py-azure-cli-telemetry@1.0.6", type=("build", "run"), when="@2.20:")
     depends_on("py-colorama@0.4.1:0.4", type=("build", "run"))
     depends_on("py-humanfriendly@4.7:8", type=("build", "run"))
     depends_on("py-jmespath", type=("build", "run"))
